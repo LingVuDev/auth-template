@@ -13,8 +13,12 @@ import FormError from "../ui/form-error";
 import FormSuccess from "../ui/form-success";
 import { login } from "@/actions/login";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { useSearchParams } from "next/navigation";
 
 const LoginForm = () => {
+  const searchParams = useSearchParams();
+  const urlError = searchParams.get("error") === "OAuthAccountNotLinked" ? "This account is already registered with another provider." : "";
+
   const [error, setError] = useState<string>("");
   const [isPending, startTransition] = useTransition();
   const form = useForm<z.infer<typeof LoginSchema>>({
@@ -75,7 +79,7 @@ const LoginForm = () => {
             />
           </div>
           {}
-          <FormError message={error} />
+          <FormError message={error || urlError} />
           <Button type="submit" className="w-full" disabled={isPending}>
             {isPending ? <AiOutlineLoading3Quarters className="mr-2 h-4 w-4 animate-spin" /> : "Login"}
           </Button>

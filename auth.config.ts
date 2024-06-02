@@ -2,27 +2,42 @@ import Credentials from "next-auth/providers/credentials"
 import type { NextAuthConfig } from "next-auth"
 import { LoginSchema } from "@/schemas"
 import { getUserByEmail } from "@/data/user";
+import Github from "next-auth/providers/github";
+import Google from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
- 
-export default { providers: [Credentials({ async authorize(credentials) {
-  const validatedFields = LoginSchema.safeParse(credentials);
 
-  if (!validatedFields.success) {
-    return null;
-  }
+export default {
+  providers: [
+    Github({
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET
+    }),
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET
+    }),
+    Credentials({
+      async authorize(credentials) {
+        const validatedFields = LoginSchema.safeParse(credentials);
 
-  const { email, password } = validatedFields.data;
-  const user = await getUserByEmail(email);
+        if (!validatedFields.success) {
+          return null;
+        }
 
-  if (!user || !user.password) {
-    return null;
-  }
+        const { email, password } = validatedFields.data;
+        const user = await getUserByEmail(email);
 
-  const passwordsMatch = await bcrypt.compare(password, user.password);
+        if (!user || !user.password) {
+          return null;
+        }
 
-  if (passwordsMatch) {
-    return user;
-  }
+        const passwordsMatch = await bcrypt.compare(password, user.password);
 
-  return null;
-} })] } satisfies NextAuthConfig
+        if (passwordsMatch) {
+          return user;
+        }
+
+        return null;
+      }
+    })]
+} satisfies NextAuthConfig
