@@ -20,6 +20,7 @@ const LoginForm = () => {
   const urlError = searchParams.get("error") === "OAuthAccountNotLinked" ? "This account is already registered with another provider." : "";
 
   const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>("");
   const [isPending, startTransition] = useTransition();
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
@@ -32,10 +33,15 @@ const LoginForm = () => {
   const onSubmit = (data: z.infer<typeof LoginSchema>) => {
     startTransition(() => {
       setError("");
+      setSuccess("");
 
       login(data).then((response) => {
         if (response && response.error) {
           setError(response.error);
+        }
+
+        if (response && response.success) {
+          setSuccess(response.success);
         }
       });
     });
@@ -80,6 +86,7 @@ const LoginForm = () => {
           </div>
           {}
           <FormError message={error || urlError} />
+          <FormSuccess message={success} />
           <Button type="submit" className="w-full" disabled={isPending}>
             {isPending ? <AiOutlineLoading3Quarters className="mr-2 h-4 w-4 animate-spin" /> : "Login"}
           </Button>
