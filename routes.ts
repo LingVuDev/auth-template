@@ -4,7 +4,8 @@
  * @type {Array<String>}
  */
 export const publicRoutes = [
-  "/"
+  "/",
+  "/auth/verify-email",
 ];
 
 /**

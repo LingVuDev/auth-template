@@ -2,6 +2,7 @@
 
 import { signIn } from '@/auth';
 import { getUserByEmail } from '@/data/user';
+import { sendVerificationEmail } from '@/lib/mail';
 import { generateVerificationToken } from '@/lib/tokens';
 import { DEFAULT_LOGIN_REDIRECT } from '@/routes';
 import { LoginSchema } from '@/schemas';
@@ -26,6 +27,11 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
   if (!existingUser.emailVerified) {
     const verificationToken = await generateVerificationToken(existingUser.email);
 
+    await sendVerificationEmail({
+      email: verificationToken.email,
+      token: verificationToken.token,
+    });
+
     return { error: "Your email address has not yet been verified." };
   }
 
@@ -43,8 +49,8 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
         default:
           return { error: 'Something went wrong!' };
       }
-    }
 
+      }
     throw error;
   }
 }
