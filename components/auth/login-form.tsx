@@ -10,17 +10,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "../ui/button";
 import FormError from "../ui/form-error";
-import FormSuccess from "../ui/form-success";
 import { login } from "@/actions/login";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 const LoginForm = () => {
   const searchParams = useSearchParams();
   const urlError = searchParams.get("error") === "OAuthAccountNotLinked" ? "This account is already registered with another provider." : "";
 
   const [error, setError] = useState<string>("");
-  const [success, setSuccess] = useState<string>("");
   const [isPending, startTransition] = useTransition();
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
@@ -33,15 +32,10 @@ const LoginForm = () => {
   const onSubmit = (data: z.infer<typeof LoginSchema>) => {
     startTransition(() => {
       setError("");
-      setSuccess("");
 
       login(data).then((response) => {
         if (response && response.error) {
           setError(response.error);
-        }
-
-        if (response && response.success) {
-          setSuccess(response.success);
         }
       });
     });
@@ -79,6 +73,9 @@ const LoginForm = () => {
                   <FormControl>
                     <Input {...field} placeholder="******" type="password" disabled={isPending} />
                   </FormControl>
+                  <Button size="sm" variant="link" asChild className="px-0 font-normal">
+                    <Link href="/auth/reset">Forgot password?</Link>
+                  </Button>
                   <FormMessage>{form.formState.errors.password?.message}</FormMessage>
                 </FormItem>
               )}
@@ -86,7 +83,6 @@ const LoginForm = () => {
           </div>
           {}
           <FormError message={error || urlError} />
-          <FormSuccess message={success} />
           <Button type="submit" className="w-full" disabled={isPending}>
             {isPending ? <AiOutlineLoading3Quarters className="mr-2 h-4 w-4 animate-spin" /> : "Login"}
           </Button>

@@ -1,9 +1,11 @@
 import NewVerificationForm from '@/components/auth/new-verification-form'
-import React from 'react'
+import React, { Suspense } from 'react'
 
 const VerifyEmailPage = () => {
   return (
-    <NewVerificationForm />
+    <Suspense>
+      <NewVerificationForm />
+    </Suspense>
   )
 }
 

@@ -21,6 +21,12 @@ To get started with this template, follow these steps:
   npm run dev
   ```
 
+## Prisma
+
+To open the db GUI
+```
+npx prisma studio
+```
 
 ## Learn More
 
